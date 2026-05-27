@@ -47,9 +47,10 @@
    are cancelled, listeners are removed, the AudioContext is
    closed.
 
-   Audio: bed via SaprosAudioBed (m_suspense.mp3 at base 0.18).
-   Per-tone pulses via Web Audio OscillatorNode, peak scaled by
-   SaprosAudio.effectiveGain() so main-game mute is live.
+   Audio: per-tone synth ONLY. No background music bed (the
+   memory game needs silence between tones to read clearly). Tone
+   peaks are scaled by SaprosAudio.effectiveGain() so the main
+   game's mute / volume still drives them.
 
    Visuals: gold-on-black; six button colors drawn from the
    Sapros wave palette (cyan/amber/violet/green/ice/red) so it
@@ -127,17 +128,12 @@
     const t         = tFor();
     const reduced   = reducedMotion();
 
-    // ----- audio bed (helper) ----------------------------------
-    const bed = (global.SaprosAudioBed && global.SaprosAudioBed.create)
-      ? global.SaprosAudioBed.create({
-          url:     (o.audioBaseUrl || '../../audio/') + 'm_suspense.mp3',
-          base:    0.18,
-          fadeIn:  1200,
-          fadeOut: 400,
-        })
-      : { start(){}, stop(){}, destroy(){} };
-
-    // ----- per-tone synth --------------------------------------
+    // ----- audio: per-tone synth only --------------------------
+    // (Background music bed intentionally OMITTED. The memory game
+    // needs silence between tones so the sequence reads clearly.
+    // Per-tone synth peaks are still routed through
+    // SaprosAudio.effectiveGain() so the main-game mute / volume
+    // controls still drive them.)
     let audioCtx = null;
     function ensureAudioCtx() {
       if (audioCtx) return audioCtx;
@@ -271,7 +267,12 @@
     promptEl.textContent = '';
     stage.appendChild(promptEl);
 
-    // Pad: the 6-button row
+    // Pad wrap: contains the 2×3 button grid + a vertical
+    // progress bar that rises as the streak grows. The bar sits to
+    // the right of the pad; on RTL it auto-flips via CSS.
+    const padWrap = document.createElement('div');
+    padWrap.className = 'sim-pad-wrap';
+
     const pad = document.createElement('div');
     pad.className = 'sim-pad';
     const nodeEls = [];
@@ -282,25 +283,37 @@
       btn.setAttribute('data-idx', String(i));
       btn.setAttribute('aria-label', 'Tone ' + (i + 1));
       btn.disabled = true;
-      // Apply the unique resting tint inline so style sheet stays simple
       btn.style.setProperty('--rest', BUTTON_COLORS[i].rest);
       btn.style.setProperty('--lit',  BUTTON_COLORS[i].lit);
       btn.addEventListener('click', onNodeClick);
       pad.appendChild(btn);
       nodeEls.push(btn);
     }
-    stage.appendChild(pad);
+    padWrap.appendChild(pad);
 
-    // Meta row: streak / best / target
-    const meta = document.createElement('div');
-    meta.className = 'sim-meta';
-    const metaStreak = document.createElement('span');
-    metaStreak.className = 'sim-meta-streak';
-    const metaBest = document.createElement('span');
-    metaBest.className = 'sim-meta-best';
-    meta.appendChild(metaStreak);
-    meta.appendChild(metaBest);
-    stage.appendChild(meta);
+    // Vertical progress line — rises from 0% to 100% as the
+    // currentStreak climbs from 0 to targetStreak (20).
+    const progressEl = document.createElement('div');
+    progressEl.className = 'sim-progress';
+    progressEl.setAttribute('aria-label',
+      'Progress 0 of ' + o.targetStreak);
+    progressEl.setAttribute('role', 'progressbar');
+    progressEl.setAttribute('aria-valuemin', '0');
+    progressEl.setAttribute('aria-valuemax', String(o.targetStreak));
+    progressEl.setAttribute('aria-valuenow', '0');
+    const progressFill = document.createElement('div');
+    progressFill.className = 'sim-progress-fill';
+    progressEl.appendChild(progressFill);
+    // Target cap marker (so the player sees where the line is
+    // headed). The current-streak counter is intentionally absent
+    // — the bar fills, that's the only feedback per the new design.
+    const progressCap = document.createElement('div');
+    progressCap.className = 'sim-progress-cap';
+    progressCap.textContent = String(o.targetStreak);
+    progressEl.appendChild(progressCap);
+    padWrap.appendChild(progressEl);
+
+    stage.appendChild(padWrap);
 
     root.appendChild(stage);
 
@@ -355,7 +368,7 @@
     container.appendChild(root);
 
     // Initial UI state
-    renderMeta();
+    renderProgress();
     setPrompt('');
     requestAnimationFrame(() => splash.classList.add('is-shown'));
     addTimeout(() => { try { splashBegin.focus(); } catch (_) {} }, 60);
@@ -365,11 +378,15 @@
     document.addEventListener('keydown', onKeydown);
 
     // ----- UI helpers ------------------------------------------
-    function renderMeta() {
-      metaStreak.textContent = (t('minigames.simon.streak', 'Streak') + ' ' +
-                                state.currentStreak + ' / ' + o.targetStreak);
-      metaBest.textContent   = (t('minigames.simon.best', 'Best') + ' ' +
-                                state.bestStreak);
+    function renderProgress() {
+      // Fill height = currentStreak / targetStreak, clamped 0..1.
+      // The line rises as the player gets more in a row, drops back
+      // to 0 when they miss. CSS transitions the height change.
+      const pct = clamp(state.currentStreak / o.targetStreak, 0, 1) * 100;
+      progressFill.style.height = pct.toFixed(1) + '%';
+      progressEl.setAttribute('aria-valuenow', String(state.currentStreak));
+      progressEl.setAttribute('aria-label',
+        'Progress ' + state.currentStreak + ' of ' + o.targetStreak);
     }
     function setPrompt(kind) {
       promptEl.classList.remove('is-listen', 'is-your', 'is-wrong');
@@ -468,7 +485,7 @@
           if (state.currentStreak > state.bestStreak) {
             state.bestStreak = state.currentStreak;
           }
-          renderMeta();
+          renderProgress();
           // Win condition
           if (state.currentStreak >= o.targetStreak) {
             state.phase = 'between';
@@ -491,7 +508,7 @@
         wrongFlashNode(idx);
         state.totalWrong++;
         state.currentStreak = 0;
-        renderMeta();
+        renderProgress();
         state.phase = 'between';
         setNodesEnabled(false);
         setPrompt('wrong');
@@ -516,10 +533,9 @@
       splash.classList.remove('is-shown');
       addTimeout(() => { try { splash.remove(); } catch (_) {} }, 360);
       state.tStart = performance.now();
-      try { bed.start(); } catch (_) {}
       ensureAudioCtx();
       newSequence();
-      renderMeta();
+      renderProgress();
       addTimeout(() => {
         if (state.done) return;
         playSequence();
@@ -584,7 +600,6 @@
       state.phase = 'over';
       setNodesEnabled(false);
       cancelAnimationFrame(state.rafId);
-      try { bed.stop(); } catch (_) {}
 
       const result = buildResult(outcome);
       outcomeEl = document.createElement('div');
@@ -639,8 +654,6 @@
       for (const n of nodeEls) {
         try { n.removeEventListener('click', onNodeClick); } catch (_) {}
       }
-      try { bed.stop(); } catch (_) {}
-      try { bed.destroy(); } catch (_) {}
       try { if (audioCtx && audioCtx.state !== 'closed') audioCtx.close(); } catch (_) {}
       audioCtx = null;
       if (root.parentNode) root.parentNode.removeChild(root);

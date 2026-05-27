@@ -67,13 +67,27 @@
 .sim-prompt.is-your   { color: rgba(244, 241, 234, 0.92); }
 .sim-prompt.is-wrong  { color: rgba(255, 110, 90, 0.82); }
 
-/* =============== The 6-button row =============== */
-.sim-pad {
+/* =============== Pad wrap (pad + progress) ============= */
+.sim-pad-wrap {
   display: flex;
-  gap: clamp(10px, 1.6vw, 18px);
-  align-items: center; justify-content: center;
-  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 3vw, 36px);
   max-width: 96vw;
+}
+/* RTL: progress flips to the LEFT of the pad. */
+.sim-root[dir="rtl"] .sim-pad-wrap {
+  flex-direction: row-reverse;
+}
+
+/* =============== 2 × 3 button grid ============== */
+.sim-pad {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(2, auto);
+  gap: clamp(12px, 2vw, 22px);
+  align-items: center;
+  justify-content: center;
 }
 .sim-node {
   --rest: rgba(232, 200, 122, 0.32);
@@ -146,18 +160,41 @@
   opacity: 1;
 }
 
-/* =============== Meta row =============== */
-.sim-meta {
-  display: inline-flex;
-  gap: 26px;
-  font-family: var(--font-ui);
-  font-size: 11px;
-  letter-spacing: var(--cap-spacing-wide);
-  text-transform: uppercase;
-  color: rgba(244, 241, 234, 0.55);
+/* =============== Vertical progress line =============== */
+/* A thin vertical track to the right of the pad. The fill rises
+   from the bottom as the player gets more in a row, drops back
+   to zero on a wrong tap. Replaces the explicit "Streak X / 20"
+   counter — the height of the line IS the streak indicator. */
+.sim-progress {
+  position: relative;
+  width: 5px;
+  height: clamp(140px, 28vh, 220px);
+  background: rgba(232, 200, 122, 0.10);
+  border-radius: 3px;
+  overflow: visible;
 }
-.sim-meta-streak { color: rgba(232, 200, 122, 0.82); }
-.sim-meta-best   { color: rgba(244, 241, 234, 0.45); }
+.sim-progress-fill {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0;
+  height: 0%;
+  background: linear-gradient(to top,
+    rgba(232, 200, 122, 0.62),
+    rgba(232, 200, 122, 1));
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(232, 200, 122, 0.55);
+  transition: height 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.sim-progress-cap {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-ui);
+  font-size: 9px;
+  letter-spacing: var(--cap-spacing-wide);
+  color: rgba(244, 241, 234, 0.42);
+}
 
 /* =============== Buttons =============== */
 .sim-btn {
@@ -288,6 +325,8 @@
 
 /* =============== Reduced motion =============== */
 @media (prefers-reduced-motion: reduce) {
-  .sim-node, .sim-overlay, .sim-btn { transition: none !important; }
+  .sim-node, .sim-overlay, .sim-btn, .sim-progress-fill {
+    transition: none !important;
+  }
   .sim-rotate-anim { animation: none; }
 }
