@@ -1,0 +1,293 @@
+/* ============================================================
+   SIMON (Echo) — Sapros minigame visuals
+   ------------------------------------------------------------
+   Landscape-locked. Six color-coded buttons in a single
+   horizontal row. Gold-on-black chrome to match the rest of
+   the Sapros minigame family.
+   ============================================================ */
+
+.sim-root {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 50% at 50% 50%,
+      rgba(232, 200, 122, 0.04) 0%,
+      rgba(232, 200, 122, 0)   55%),
+    #08080b;
+  color: var(--text);
+  font-family: var(--font-ui);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* Edge vignette to push attention to the buttons */
+.sim-root::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(78% 65% at 50% 52%,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* =============== Stage =============== */
+.sim-stage {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 22px;
+  padding: 24px;
+  z-index: 2;
+}
+
+.sim-stage-title {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 13px;
+  color: rgba(232, 200, 122, 0.62);
+  letter-spacing: var(--cap-spacing-wide);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.sim-prompt {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-size: clamp(14px, 1.6vw, 16px);
+  color: rgba(244, 241, 234, 0.50);
+  min-height: 1.4em;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+.sim-prompt.is-listen { color: rgba(232, 200, 122, 0.92); }
+.sim-prompt.is-your   { color: rgba(244, 241, 234, 0.92); }
+.sim-prompt.is-wrong  { color: rgba(255, 110, 90, 0.82); }
+
+/* =============== The 6-button row =============== */
+.sim-pad {
+  display: flex;
+  gap: clamp(10px, 1.6vw, 18px);
+  align-items: center; justify-content: center;
+  flex-wrap: nowrap;
+  max-width: 96vw;
+}
+.sim-node {
+  --rest: rgba(232, 200, 122, 0.32);
+  --lit:  rgba(232, 200, 122, 1);
+  width: clamp(56px, 11vw, 84px);
+  height: clamp(56px, 11vw, 84px);
+  border-radius: 50%;
+  background: #131316;
+  border: 1.5px solid var(--rest);
+  color: var(--rest);
+  cursor: pointer;
+  position: relative;
+  transition: background 160ms var(--ease-out),
+              border-color 160ms var(--ease-out),
+              box-shadow 160ms var(--ease-out),
+              transform 200ms var(--ease-out);
+  outline: none;
+  padding: 0;
+}
+/* Soft inner sphere highlight */
+.sim-node::after {
+  content: '';
+  position: absolute; inset: 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%,
+              var(--rest),
+              transparent 70%);
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 160ms var(--ease-out),
+              background 160ms var(--ease-out);
+}
+.sim-node:hover { border-color: var(--lit); }
+.sim-node:focus-visible {
+  outline: 2px solid var(--lit);
+  outline-offset: 3px;
+}
+.sim-node.is-disabled { cursor: default; opacity: 0.78; }
+
+/* Lit pulse (during sequence playback OR correct player tap) */
+.sim-node.is-pulse {
+  background: var(--lit);
+  border-color: var(--lit);
+  color: #08080b;
+  box-shadow:
+    0 0 22px var(--lit),
+    0 0 48px color-mix(in srgb, var(--lit) 40%, transparent);
+  transform: scale(1.06);
+}
+.sim-node.is-pulse::after {
+  background: radial-gradient(circle at 40% 35%,
+              rgba(255, 255, 255, 0.85),
+              var(--lit) 60%,
+              transparent 100%);
+  opacity: 1;
+}
+
+/* Wrong-tap red flash */
+.sim-node.is-wrong {
+  background: rgba(255, 110, 90, 0.92);
+  border-color: rgba(255, 130, 110, 1);
+  box-shadow: 0 0 18px rgba(255, 110, 90, 0.65);
+  transform: scale(1.04);
+}
+.sim-node.is-wrong::after {
+  background: radial-gradient(circle at 40% 35%,
+              rgba(255, 240, 220, 0.85),
+              rgba(255, 110, 90, 0.55) 60%,
+              transparent 100%);
+  opacity: 1;
+}
+
+/* =============== Meta row =============== */
+.sim-meta {
+  display: inline-flex;
+  gap: 26px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: var(--cap-spacing-wide);
+  text-transform: uppercase;
+  color: rgba(244, 241, 234, 0.55);
+}
+.sim-meta-streak { color: rgba(232, 200, 122, 0.82); }
+.sim-meta-best   { color: rgba(244, 241, 234, 0.45); }
+
+/* =============== Buttons =============== */
+.sim-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: var(--cap-spacing-wide);
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--accent-dim);
+  color: var(--accent);
+  padding: 10px 22px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 180ms var(--ease-out),
+              color 180ms var(--ease-out),
+              border-color 180ms var(--ease-out);
+  outline: none;
+}
+.sim-btn:hover, .sim-btn:focus-visible {
+  background: rgba(232, 200, 122, 0.08);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+/* =============== Overlays (splash + outcome) =============== */
+.sim-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 18px;
+  padding: 28px;
+  text-align: center;
+  background: rgba(8, 8, 11, 0.92);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  z-index: 9;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms var(--ease-out);
+}
+.sim-overlay.is-shown {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sim-title {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(24px, 3.5vw, 32px);
+  color: var(--text);
+  margin: 0;
+}
+.sim-body {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-size: clamp(15px, 1.6vw, 17px);
+  color: var(--text-dim);
+  line-height: 1.55;
+  max-width: 44ch;
+  margin: 0;
+}
+
+/* Outcome variants — color the headline */
+.sim-outcome-title {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(28px, 4vw, 36px);
+  color: var(--text);
+  margin: 0;
+  line-height: 1.15;
+}
+.sim-outcome-body {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-size: clamp(15px, 1.6vw, 17px);
+  color: var(--text-dim);
+  line-height: 1.55;
+  max-width: 38ch;
+  margin: 0;
+}
+.sim-outcome-cleared .sim-outcome-title { color: var(--accent); }
+.sim-outcome-aborted .sim-outcome-title { color: rgba(244, 241, 234, 0.72); }
+
+/* =============== Landscape gate =============== */
+.sim-rotate {
+  position: absolute; inset: 0;
+  display: none;
+  align-items: center; justify-content: center;
+  background: rgba(8, 8, 11, 0.97);
+  z-index: 11;
+  color: var(--text);
+  text-align: center;
+  padding: 24px;
+}
+@media (orientation: portrait) and (max-width: 900px) {
+  .sim-rotate { display: flex; }
+}
+.sim-rotate-inner {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 16px;
+  max-width: 320px;
+}
+.sim-rotate-icon { color: var(--accent); opacity: 0.85; }
+.sim-rotate-anim {
+  transform-origin: 55px 35px;
+  animation: sim-rotate-spin 2400ms ease-in-out infinite;
+}
+@keyframes sim-rotate-spin {
+  0%   { transform: rotate(0deg); }
+  40%  { transform: rotate(-90deg); }
+  60%  { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+.sim-rotate-title {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-size: clamp(20px, 4vw, 24px);
+  color: var(--text);
+}
+.sim-rotate-hint {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: var(--cap-spacing-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* =============== Reduced motion =============== */
+@media (prefers-reduced-motion: reduce) {
+  .sim-node, .sim-overlay, .sim-btn { transition: none !important; }
+  .sim-rotate-anim { animation: none; }
+}

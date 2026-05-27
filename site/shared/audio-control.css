@@ -1,0 +1,98 @@
+/* ============================================================
+   SAPROS MINIGAMES — shared mute / volume control
+   Ports the look + behavior of Sapros's .global-mute-control:
+   - 44×44 round ♪ button, top-left (LTR) / top-right (RTL)
+   - Hover (desktop only) reveals a 160px volume popout below
+   - Muted state: dimmer color + a diagonal stroke
+   - Touch / mobile: tap toggles mute; volume comes from a long-
+     press popout (tap-once-to-show, tap-again-to-hide)
+   ============================================================ */
+
+.sa-control {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  inset-inline-start: max(16px, env(safe-area-inset-left));
+  z-index: 9999;
+  display: inline-block;
+}
+
+.sa-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(10, 10, 10, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background 0.2s, transform 0.1s, opacity 0.2s;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  font-family: var(--font-ui);
+}
+.sa-btn:active { transform: scale(0.94); background: rgba(10, 10, 10, 0.75); }
+.sa-btn:hover  { color: var(--text); }
+.sa-btn:focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
+
+.sa-btn.is-muted { color: rgba(255, 255, 255, 0.3); }
+.sa-btn.is-muted::after {
+  content: '';
+  position: absolute;
+  width: 60%;
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.55);
+  transform: rotate(-25deg);
+}
+
+.sa-popout {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  width: 160px;
+  padding: 10px 12px;
+  background: rgba(18, 18, 20, 0.96);
+  border: 1px solid rgba(232, 200, 122, 0.34);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+  z-index: 110;
+}
+.sa-slider {
+  width: 100%;
+  margin: 0;
+  cursor: pointer;
+  accent-color: rgba(232, 200, 122, 0.85);
+}
+
+/* Desktop: reveal on hover or focus. */
+@media (hover: hover) and (pointer: fine) {
+  .sa-control:hover .sa-popout,
+  .sa-control:focus-within .sa-popout {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+}
+/* Touch: an explicit class added by JS on tap-and-hold or
+   double-tap shows the popout; another tap dismisses. */
+.sa-popout.is-shown {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sa-btn, .sa-popout {
+    transition: none !important;
+  }
+}

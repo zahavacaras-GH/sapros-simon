@@ -1,0 +1,50 @@
+/* ============================================================
+   SAPROS MINIGAMES — shared theme tokens
+   Mirrors site/style.css in the main Sapros repo so the merge
+   back is trivial. Keep colors, type, and motion easings in sync.
+   ============================================================ */
+
+:root {
+  /* Palette — from the Sapros design brief. */
+  --bg:               #0a0a0a;
+  --bg-elev:          #131313;
+  --bg-elev-2:        #1a1a1a;
+  --accent:           #e8c87a;   /* warm gold — recessed LED feel */
+  --accent-dim:       rgba(232, 200, 122, 0.55);
+  --text:             #f4f1ea;   /* cream */
+  --text-dim:         rgba(244, 241, 234, 0.78);
+  --text-faint:       rgba(244, 241, 234, 0.42);
+  --hairline:         rgba(244, 241, 234, 0.08);
+  --warn:             #c64c3a;   /* warning red */
+  --ok:               #79c889;   /* success green */
+  --amber:            #d4a043;   /* drifting amber */
+
+  /* Type stack. Cormorant Garamond per the brief, with the
+     locally-available faces Sapros itself uses as fallback. */
+  --font-prose:  'Cormorant Garamond', 'Iowan Old Style',
+                 'Palatino Linotype', 'Source Serif Pro',
+                 Georgia, serif;
+  --font-ui:     -apple-system, BlinkMacSystemFont, 'Inter',
+                 'Segoe UI', sans-serif;
+
+  --cap-spacing-tight:  0.12em;
+  --cap-spacing-wide:   0.32em;
+
+  /* Motion — generous easings, never bouncy. */
+  --ease-out:    cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* RTL flips */
+html[dir="rtl"] {
+  /* font-prose stays the same — Hebrew falls through to system serif */
+  --cap-spacing-tight: 0.06em;
+  --cap-spacing-wide:  0.16em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ease-out:    linear;
+    --ease-in-out: linear;
+  }
+}

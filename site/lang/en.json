@@ -1,0 +1,34 @@
+{
+  "common": {
+    "skip": "Skip",
+    "esc": "Esc",
+    "back": "Back",
+    "begin": "Begin",
+    "continue": "Continue",
+    "audio": "Audio",
+    "toggle_audio": "Toggle audio",
+    "volume": "Volume",
+    "audio_optional": "Audio is part of the scene; play with sound on if you can.",
+    "rotate_title": "Rotate your phone.",
+    "rotate_hint": "This scene plays in landscape."
+  },
+  "minigames": {
+    "simon": {
+      "title": "Echo",
+      "prompt": "Watch. Then repeat.",
+      "startBody": "A pattern will play. Repeat it back. Each correct run adds one to the streak. Twenty in a row to win.",
+      "btnBegin": "Begin",
+      "btnQuit": "Stop trying",
+      "btnContinue": "Continue",
+      "promptListen": "Listen.",
+      "promptYourTurn": "Your turn.",
+      "promptWrong": "Wrong tone. Reset.",
+      "streak": "Streak",
+      "best": "Best",
+      "outcomeClearedTitle": "Twenty.",
+      "outcomeClearedBody": "The pattern held all the way through.",
+      "outcomeAbortedTitle": "Walked away.",
+      "outcomeAbortedBody": "The pattern is gone."
+    }
+  }
+}

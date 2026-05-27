@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>Simon — Sapros</title>
+  <link rel="icon" href="../../../favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="../../shared/theme.css" />
+  <link rel="stylesheet" href="../../shared/base.css" />
+  <link rel="stylesheet" href="../../shared/audio-control.css" />
+  <link rel="stylesheet" href="../../shared/rotate-prompt.css" />
+  <link rel="stylesheet" href="simon.css" />
+  <style>
+    /* Demo-page shell. The minigame mounts inside #mg-root and takes
+       it over fully. The bottom replay strip is the harness, not the
+       minigame; Sapros itself won't render it when merged. */
+    body { background: #0a0a0a; }
+    #mg-root { position: fixed; inset: 0; }
+
+    /* The minigame has its own landscape rotate gate; suppress the
+       shared portrait-only one on this demo page. */
+    .sapros-rotate-prompt { display: none !important; }
+
+    .sim-demo-panel {
+      position: fixed;
+      bottom: 18px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 14px; align-items: center;
+      padding: 8px 14px;
+      background: rgba(10, 10, 10, 0.85);
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      font-family: var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: var(--cap-spacing-tight);
+      font-size: 10px;
+      color: var(--text-faint);
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms ease-out;
+    }
+    .sim-demo-panel.is-shown { opacity: 1; pointer-events: auto; }
+    .sim-demo-panel a, .sim-demo-panel button {
+      color: var(--accent);
+      font: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      padding: 4px 10px;
+      border: 1px solid var(--hairline);
+      border-radius: 2px;
+      text-decoration: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    .sim-demo-panel a:hover, .sim-demo-panel button:hover {
+      color: var(--text); border-color: var(--accent-dim);
+    }
+    .sim-demo-panel .sim-demo-result {
+      color: var(--text-dim);
+      padding-inline-end: 6px;
+    }
+    .sim-demo-panel .sim-sep {
+      width: 1px; align-self: stretch;
+      background: var(--hairline);
+    }
+  </style>
+</head>
+<body>
+  <main id="mg-root" class="mg-host" aria-label="Simon minigame"></main>
+
+  <div class="sim-demo-panel" id="sim-demo-panel" aria-live="polite">
+    <span class="sim-demo-result" id="sim-demo-result"></span>
+    <button id="sim-demo-replay" type="button">Again</button>
+    <span class="sim-sep" aria-hidden="true"></span>
+    <a href="../../../index.html" id="sim-demo-back">Gallery</a>
+  </div>
+
+  <script src="../../shared/i18n.js"></script>
+  <script src="../../shared/audio-control.js"></script>
+  <script src="../../shared/audio-bed.js"></script>
+  <script src="../../shared/rotate-prompt.js"></script>
+  <script src="simon.js"></script>
+  <script>
+    SaprosI18n.setLangPath('../../lang/');
+
+    const root      = document.getElementById('mg-root');
+    const panel     = document.getElementById('sim-demo-panel');
+    const resultEl  = document.getElementById('sim-demo-result');
+    const replayBtn = document.getElementById('sim-demo-replay');
+    const backLink  = document.getElementById('sim-demo-back');
+
+    function showPanel(text) {
+      resultEl.textContent = text;
+      panel.classList.add('is-shown');
+    }
+    function hidePanel() { panel.classList.remove('is-shown'); }
+
+    function summarise(r) {
+      if (!r) return 'no-result';
+      const parts = [
+        'outcome: ' + r.outcome,
+        'best ' + r.bestStreak + '/' + r.target,
+        'taps ' + r.totalTaps,
+        'wrong ' + r.totalWrong,
+        Math.round((r.elapsedMs || 0) / 1000) + 's',
+      ];
+      if (r.stage) parts.push('stage:' + r.stage);
+      return parts.join(' · ');
+    }
+
+    function play() {
+      hidePanel();
+      window.SaprosMinigames.simon.start({
+        container:    root,
+        lang:         SaprosI18n.getLang(),
+        audioBaseUrl: '../../audio/',
+        onComplete: (r) => showPanel(summarise(r)),
+        onSkip:     (r) => showPanel(summarise(r)),
+      });
+    }
+
+    replayBtn.addEventListener('click', play);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && panel.classList.contains('is-shown')) {
+        backLink.click();
+      }
+    });
+
+    (async () => {
+      const saved = (() => {
+        try { return localStorage.getItem('sapros-mg-lang'); }
+        catch (_) { return null; }
+      })();
+      await SaprosI18n.load(saved || 'en');
+      SaprosAudio.mount(document.body);
+      play();
+    })();
+  </script>
+</body>
+</html>

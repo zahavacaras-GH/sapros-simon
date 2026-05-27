@@ -1,0 +1,72 @@
+/* ============================================================
+   SAPROS MINIGAMES — portrait-only gate
+   Shown only on small touch devices in landscape orientation.
+   Grays out + blurs whatever's underneath and asks the player to
+   rotate. Above every other overlay (skip button, audio control,
+   splash, outcome).
+   ============================================================ */
+
+.rotate-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(10, 10, 10, 0.78);
+  -webkit-backdrop-filter: grayscale(1) blur(4px);
+  backdrop-filter: grayscale(1) blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+.rotate-overlay-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 32ch;
+}
+.rotate-icon {
+  color: var(--accent);
+  display: block;
+}
+.rotate-icon svg { display: block; }
+.rotate-overlay-title {
+  font-family: var(--font-prose);
+  font-style: italic;
+  font-size: clamp(22px, 4.5vw, 30px);
+  margin: 0;
+  color: var(--text);
+  line-height: 1.2;
+}
+.rotate-overlay-subtitle {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: var(--cap-spacing-wide);
+  color: var(--text-faint);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* A slow nudge animation on the icon — pulses the rotation
+   suggestion. Killed with reduced motion. */
+@keyframes rotate-pulse {
+  0%, 100% { transform: rotate(-6deg); }
+  50%      { transform: rotate(6deg); }
+}
+.rotate-icon-anim {
+  animation: rotate-pulse 1800ms ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Trigger — small touch devices in landscape. Tablets and
+   desktops are unaffected. */
+@media (orientation: landscape) and (max-height: 520px)
+       and (hover: none) and (pointer: coarse) {
+  .rotate-overlay { display: flex; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotate-icon-anim { animation: none; }
+}

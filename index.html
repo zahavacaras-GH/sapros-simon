@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>Sapros — Simon (Echo)</title>
+  <meta name="description" content="A six-button Simon-style memory minigame for the Sapros interactive fiction game." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="site/shared/theme.css" />
+  <link rel="stylesheet" href="site/shared/base.css" />
+  <link rel="stylesheet" href="site/shared/audio-control.css" />
+  <link rel="stylesheet" href="site/shared/rotate-prompt.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .gallery {
+      flex: 1;
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 64px 28px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .gallery-head .eyebrow {
+      font-family: var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: var(--cap-spacing-wide);
+      font-size: 11px;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .gallery-head h1 {
+      font-family: var(--font-prose);
+      font-weight: 400;
+      font-size: clamp(30px, 5vw, 44px);
+      letter-spacing: var(--cap-spacing-tight);
+      margin: 0 0 14px;
+      color: var(--text);
+    }
+    .gallery-head .tagline {
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 17px;
+      max-width: 52ch;
+      line-height: 1.5;
+    }
+    .tile {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 28px;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 240px;
+      border: 1px solid var(--hairline);
+      transition: background 240ms var(--ease-out),
+                  border-color 240ms var(--ease-out);
+    }
+    .tile:hover, .tile:focus-visible {
+      background: var(--bg-elev);
+      border-color: var(--accent-dim);
+      outline: none;
+    }
+    .tile-name {
+      font-family: var(--font-prose);
+      font-size: 28px;
+      line-height: 1.1;
+      margin: 0;
+      color: var(--text);
+    }
+    .tile-scene {
+      font-family: var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: var(--cap-spacing-tight);
+      font-size: 11px;
+      color: var(--text-faint);
+      margin-top: 10px;
+    }
+    .tile-hint {
+      font-family: var(--font-prose);
+      font-style: italic;
+      font-size: 15px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .tile-cta {
+      font-family: var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: var(--cap-spacing-tight);
+      font-size: 11px;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tile-cta::after {
+      content: "→";
+      transition: transform 200ms var(--ease-out);
+    }
+    .tile:hover .tile-cta::after { transform: translateX(4px); }
+    footer {
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 28px 28px;
+      color: var(--text-faint);
+      font-size: 12px;
+      font-family: var(--font-ui);
+      letter-spacing: var(--cap-spacing-tight);
+      text-transform: uppercase;
+      border-top: 1px solid var(--hairline);
+    }
+  </style>
+</head>
+<body>
+  <main class="gallery">
+    <header class="gallery-head">
+      <div class="eyebrow">A Sapros minigame</div>
+      <h1>Echo</h1>
+      <p class="tagline">Six tones. Watch the pattern. Repeat it back. Twenty in a row to win — wrong tones reset the streak, never the game.</p>
+    </header>
+    <a class="tile" href="site/minigames/simon/index.html" aria-label="Play Echo">
+      <div>
+        <div class="tile-name">Echo</div>
+        <div class="tile-scene">Six-button Simon · landscape</div>
+      </div>
+      <p class="tile-hint">A neutral memory-pattern minigame intended for integration into Sapros. Host writes the narrative.</p>
+      <span class="tile-cta">Play</span>
+    </a>
+  </main>
+  <footer>
+    Source · github.com/zahavacaras-GH/sapros-simon
+  </footer>
+
+  <script src="site/shared/i18n.js"></script>
+  <script src="site/shared/audio-control.js"></script>
+  <script src="site/shared/rotate-prompt.js"></script>
+  <script>
+    SaprosI18n.setLangPath('site/lang/');
+    (async () => {
+      await SaprosI18n.load('en');
+      SaprosAudio.mount(document.body);
+    })();
+  </script>
+</body>
+</html>
