@@ -304,13 +304,23 @@
     const progressFill = document.createElement('div');
     progressFill.className = 'sim-progress-fill';
     progressEl.appendChild(progressFill);
-    // Target cap marker (so the player sees where the line is
-    // headed). The current-streak counter is intentionally absent
-    // — the bar fills, that's the only feedback per the new design.
+    // Top cap: a small "20" target marker (so the player can see
+    // where the line is climbing toward).
     const progressCap = document.createElement('div');
     progressCap.className = 'sim-progress-cap';
     progressCap.textContent = String(o.targetStreak);
     progressEl.appendChild(progressCap);
+
+    // Bottom counter: the LIVE streak number. Starts at 0 and ticks
+    // up one each time the player completes a sequence correctly,
+    // reaching o.targetStreak (20) at win. Resets to 0 on a wrong
+    // tap. This is the explicit "counting thing" referenced in
+    // the brief — the rising bar shows progress visually, this
+    // shows it numerically.
+    const progressNow = document.createElement('div');
+    progressNow.className = 'sim-progress-now';
+    progressNow.textContent = '0';
+    progressEl.appendChild(progressNow);
     padWrap.appendChild(progressEl);
 
     stage.appendChild(padWrap);
@@ -384,6 +394,8 @@
       // to 0 when they miss. CSS transitions the height change.
       const pct = clamp(state.currentStreak / o.targetStreak, 0, 1) * 100;
       progressFill.style.height = pct.toFixed(1) + '%';
+      // Live count display at the bottom of the bar.
+      progressNow.textContent = String(state.currentStreak);
       progressEl.setAttribute('aria-valuenow', String(state.currentStreak));
       progressEl.setAttribute('aria-label',
         'Progress ' + state.currentStreak + ' of ' + o.targetStreak);

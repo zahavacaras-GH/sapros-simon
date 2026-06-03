@@ -195,6 +195,23 @@
   letter-spacing: var(--cap-spacing-wide);
   color: rgba(244, 241, 234, 0.42);
 }
+/* Live streak number at the bottom of the bar. More prominent
+   than the static "20" target cap above. Updates each round. */
+.sim-progress-now {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  /* Smooth fade-in transition when the number changes */
+  transition: color 200ms var(--ease-out);
+}
 
 /* =============== Buttons =============== */
 .sim-btn {
@@ -361,6 +378,10 @@
   .sim-progress-cap {
     top: -22px;
     font-size: 10px;
+  }
+  .sim-progress-now {
+    bottom: -30px;
+    font-size: 15px;
   }
 }
 
