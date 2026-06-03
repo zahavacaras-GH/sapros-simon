@@ -23,6 +23,8 @@
       "promptListen": "Listen.",
       "promptYourTurn": "Your turn.",
       "promptWrong": "Wrong tone. Reset.",
+      "rotateTitle": "Rotate your phone.",
+      "rotateHint": "This scene plays in portrait.",
       "outcomeClearedTitle": "Twenty.",
       "outcomeClearedBody": "The pattern held all the way through.",
       "outcomeAbortedTitle": "Walked away.",

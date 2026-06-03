@@ -290,7 +290,11 @@
   text-align: center;
   padding: 24px;
 }
-@media (orientation: portrait) and (max-width: 900px) {
+/* Portrait-locked game: show the rotate gate when the player is in
+   LANDSCAPE on a small viewport (mobile / handheld). The max-height
+   guard keeps desktop browsers — which are usually landscape but
+   plenty tall — from triggering the gate. */
+@media (orientation: landscape) and (max-height: 540px) {
   .sim-rotate { display: flex; }
 }
 .sim-rotate-inner {

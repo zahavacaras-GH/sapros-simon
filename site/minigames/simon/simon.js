@@ -355,8 +355,8 @@
             '</g>' +
           '</svg>' +
         '</div>' +
-        '<div class="sim-rotate-title">' + escapeHtml(t('common.rotate_title', 'Rotate your phone.')) + '</div>' +
-        '<div class="sim-rotate-hint">' + escapeHtml(t('common.rotate_hint', 'This scene plays in landscape.')) + '</div>' +
+        '<div class="sim-rotate-title">' + escapeHtml(t('minigames.simon.rotateTitle', 'Rotate your phone.')) + '</div>' +
+        '<div class="sim-rotate-hint">' + escapeHtml(t('minigames.simon.rotateHint', 'This scene plays in portrait.')) + '</div>' +
       '</div>';
     root.appendChild(rotateGate);
 
