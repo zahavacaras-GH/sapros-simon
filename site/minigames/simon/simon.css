@@ -279,7 +279,12 @@
 .sim-outcome-cleared .sim-outcome-title { color: var(--accent); }
 .sim-outcome-aborted .sim-outcome-title { color: rgba(244, 241, 234, 0.72); }
 
-/* =============== Landscape gate =============== */
+/* =============== Rotate gate — DISABLED =============== */
+/* The game adapts to whatever orientation the device is in:
+   desktop is naturally landscape, phones are naturally portrait,
+   and the 3×2 grid + progress line look fine in either. No gate.
+   The DOM node is left in place (kept for future re-enablement)
+   but is permanently `display: none`. */
 .sim-rotate {
   position: absolute; inset: 0;
   display: none;
@@ -289,13 +294,6 @@
   color: var(--text);
   text-align: center;
   padding: 24px;
-}
-/* Portrait-locked game: show the rotate gate when the player is in
-   LANDSCAPE on a small viewport (mobile / handheld). The max-height
-   guard keeps desktop browsers — which are usually landscape but
-   plenty tall — from triggering the gate. */
-@media (orientation: landscape) and (max-height: 540px) {
-  .sim-rotate { display: flex; }
 }
 .sim-rotate-inner {
   display: flex; flex-direction: column;
@@ -325,6 +323,45 @@
   letter-spacing: var(--cap-spacing-wide);
   text-transform: uppercase;
   color: var(--text-faint);
+}
+
+/* =============== Phone-size adaptations =============== */
+/* On small viewports the play area is mostly the buttons. Scale
+   them up significantly so they're easy to thumb-tap, and pull
+   the progress line out of the row to sit at the right EDGE of
+   the screen — gives the "rising at the edge" feel rather than
+   "ankle-high next to the buttons." */
+@media (max-width: 640px) {
+  /* Bigger circles. 22vw on a 390px viewport = ~86px; on a 640px
+     viewport = 132px → clamped to 120px max. */
+  .sim-node {
+    width:  clamp(76px, 22vw, 120px);
+    height: clamp(76px, 22vw, 120px);
+  }
+  /* Gap between circles grows too so the cluster doesn't feel
+     cramped at the larger size. */
+  .sim-pad {
+    gap: clamp(14px, 4vw, 26px);
+  }
+  /* Pad-wrap collapses: progress line is no longer a flex sibling. */
+  .sim-pad-wrap { gap: 0; }
+  /* Progress line — break out of the flex flow, anchor to the
+     right edge of the play surface, take a generous vertical
+     stretch (top 18% → bottom 18% of viewport). The "20" cap
+     label sits a bit further from the top edge accordingly. */
+  .sim-progress {
+    position: absolute;
+    top: 18%;
+    bottom: 18%;
+    right: clamp(10px, 3vw, 22px);
+    width: 6px;
+    height: auto;
+    border-radius: 4px;
+  }
+  .sim-progress-cap {
+    top: -22px;
+    font-size: 10px;
+  }
 }
 
 /* =============== Reduced motion =============== */
